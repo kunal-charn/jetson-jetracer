@@ -7,7 +7,8 @@ import csv
 import numpy as np
 from cv_bridge import CvBridge, CvBridgeError
 import base64
-
+from PIL import Image
+from io import BytesIO
 
 data_list = []
 
@@ -15,7 +16,7 @@ def callback(data):
     # Save data to the list
     bridge = CvBridge()
 
-    data_list.append((data.image.data, data.steering_angle.data, data.throttle_value.data))
+    data_list.append((data.compressed_image.data, data.steering_angle.data, data.throttle_value.data))
 
     
     
@@ -39,11 +40,15 @@ def save_to_csv(data, filename):
         csvwriter.writerow(['Image', 'Steering', 'Throttle'])  # Write header
 
         for item in data:
-            image_data = base64.b64encode(item[0]).decode('utf-8') if item[0] is not None else None
-            steering_angle = item[1]
-            throttle_value = item[2]
-            
-            csvwriter.writerow([image_data, steering_angle, throttle_value])
+                    # Use item[0] directly as binary image data
+                    image_array = np.frombuffer(item[0], dtype=np.uint8)
+
+                
+                    steering_angle = item[1]
+                    throttle_value = item[2]
+                    np.set_printoptions(threshold=np.inf)
+
+                    csvwriter.writerow([image_array, steering_angle, throttle_value])
 
 
 def listener():

@@ -15,7 +15,7 @@
 #include <ros/builtin_message_traits.h>
 #include <ros/message_operations.h>
 
-#include <sensor_msgs/Image.h>
+#include <sensor_msgs/CompressedImage.h>
 #include <std_msgs/Float32.h>
 #include <std_msgs/Float32.h>
 
@@ -27,12 +27,12 @@ struct custom_
   typedef custom_<ContainerAllocator> Type;
 
   custom_()
-    : image()
+    : compressed_image()
     , steering_angle()
     , throttle_value()  {
     }
   custom_(const ContainerAllocator& _alloc)
-    : image(_alloc)
+    : compressed_image(_alloc)
     , steering_angle(_alloc)
     , throttle_value(_alloc)  {
   (void)_alloc;
@@ -40,8 +40,8 @@ struct custom_
 
 
 
-   typedef  ::sensor_msgs::Image_<ContainerAllocator>  _image_type;
-  _image_type image;
+   typedef  ::sensor_msgs::CompressedImage_<ContainerAllocator>  _compressed_image_type;
+  _compressed_image_type compressed_image;
 
    typedef  ::std_msgs::Float32_<ContainerAllocator>  _steering_angle_type;
   _steering_angle_type steering_angle;
@@ -78,7 +78,7 @@ return s;
 template<typename ContainerAllocator1, typename ContainerAllocator2>
 bool operator==(const ::custom_msg_python::custom_<ContainerAllocator1> & lhs, const ::custom_msg_python::custom_<ContainerAllocator2> & rhs)
 {
-  return lhs.image == rhs.image &&
+  return lhs.compressed_image == rhs.compressed_image &&
     lhs.steering_angle == rhs.steering_angle &&
     lhs.throttle_value == rhs.throttle_value;
 }
@@ -102,16 +102,6 @@ namespace message_traits
 
 
 template <class ContainerAllocator>
-struct IsMessage< ::custom_msg_python::custom_<ContainerAllocator> >
-  : TrueType
-  { };
-
-template <class ContainerAllocator>
-struct IsMessage< ::custom_msg_python::custom_<ContainerAllocator> const>
-  : TrueType
-  { };
-
-template <class ContainerAllocator>
 struct IsFixedSize< ::custom_msg_python::custom_<ContainerAllocator> >
   : FalseType
   { };
@@ -119,6 +109,16 @@ struct IsFixedSize< ::custom_msg_python::custom_<ContainerAllocator> >
 template <class ContainerAllocator>
 struct IsFixedSize< ::custom_msg_python::custom_<ContainerAllocator> const>
   : FalseType
+  { };
+
+template <class ContainerAllocator>
+struct IsMessage< ::custom_msg_python::custom_<ContainerAllocator> >
+  : TrueType
+  { };
+
+template <class ContainerAllocator>
+struct IsMessage< ::custom_msg_python::custom_<ContainerAllocator> const>
+  : TrueType
   { };
 
 template <class ContainerAllocator>
@@ -137,12 +137,12 @@ struct MD5Sum< ::custom_msg_python::custom_<ContainerAllocator> >
 {
   static const char* value()
   {
-    return "48c8011b63e2f995bac8b531cb24cad0";
+    return "3a65ddb3433fdf5ed9029c363843bd15";
   }
 
   static const char* value(const ::custom_msg_python::custom_<ContainerAllocator>&) { return value(); }
-  static const uint64_t static_value1 = 0x48c8011b63e2f995ULL;
-  static const uint64_t static_value2 = 0xbac8b531cb24cad0ULL;
+  static const uint64_t static_value1 = 0x3a65ddb3433fdf5eULL;
+  static const uint64_t static_value2 = 0xd9029c363843bd15ULL;
 };
 
 template<class ContainerAllocator>
@@ -161,15 +161,13 @@ struct Definition< ::custom_msg_python::custom_<ContainerAllocator> >
 {
   static const char* value()
   {
-    return "sensor_msgs/Image image\n"
+    return "sensor_msgs/CompressedImage compressed_image\n"
 "std_msgs/Float32 steering_angle\n"
 "std_msgs/Float32 throttle_value\n"
 "\n"
 "================================================================================\n"
-"MSG: sensor_msgs/Image\n"
-"# This message contains an uncompressed image\n"
-"# (0, 0) is at top-left corner of image\n"
-"#\n"
+"MSG: sensor_msgs/CompressedImage\n"
+"# This message contains a compressed image\n"
 "\n"
 "Header header        # Header timestamp should be acquisition time of image\n"
 "                     # Header frame_id should be optical frame of camera\n"
@@ -177,23 +175,11 @@ struct Definition< ::custom_msg_python::custom_<ContainerAllocator> >
 "                     # +x should point to the right in the image\n"
 "                     # +y should point down in the image\n"
 "                     # +z should point into to plane of the image\n"
-"                     # If the frame_id here and the frame_id of the CameraInfo\n"
-"                     # message associated with the image conflict\n"
-"                     # the behavior is undefined\n"
 "\n"
-"uint32 height         # image height, that is, number of rows\n"
-"uint32 width          # image width, that is, number of columns\n"
-"\n"
-"# The legal values for encoding are in file src/image_encodings.cpp\n"
-"# If you want to standardize a new string format, join\n"
-"# ros-users@lists.sourceforge.net and send an email proposing a new encoding.\n"
-"\n"
-"string encoding       # Encoding of pixels -- channel meaning, ordering, size\n"
-"                      # taken from the list of strings in include/sensor_msgs/image_encodings.h\n"
-"\n"
-"uint8 is_bigendian    # is this data bigendian?\n"
-"uint32 step           # Full row length in bytes\n"
-"uint8[] data          # actual matrix data, size is (step * rows)\n"
+"string format        # Specifies the format of the data\n"
+"                     #   Acceptable values:\n"
+"                     #     jpeg, png\n"
+"uint8[] data         # Compressed image buffer\n"
 "\n"
 "================================================================================\n"
 "MSG: std_msgs/Header\n"
@@ -232,7 +218,7 @@ namespace serialization
   {
     template<typename Stream, typename T> inline static void allInOne(Stream& stream, T m)
     {
-      stream.next(m.image);
+      stream.next(m.compressed_image);
       stream.next(m.steering_angle);
       stream.next(m.throttle_value);
     }
@@ -253,9 +239,9 @@ struct Printer< ::custom_msg_python::custom_<ContainerAllocator> >
 {
   template<typename Stream> static void stream(Stream& s, const std::string& indent, const ::custom_msg_python::custom_<ContainerAllocator>& v)
   {
-    s << indent << "image: ";
+    s << indent << "compressed_image: ";
     s << std::endl;
-    Printer< ::sensor_msgs::Image_<ContainerAllocator> >::stream(s, indent + "  ", v.image);
+    Printer< ::sensor_msgs::CompressedImage_<ContainerAllocator> >::stream(s, indent + "  ", v.compressed_image);
     s << indent << "steering_angle: ";
     s << std::endl;
     Printer< ::std_msgs::Float32_<ContainerAllocator> >::stream(s, indent + "  ", v.steering_angle);

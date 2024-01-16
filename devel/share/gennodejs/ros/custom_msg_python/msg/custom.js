@@ -20,16 +20,16 @@ class custom {
   constructor(initObj={}) {
     if (initObj === null) {
       // initObj === null is a special case for deserialization where we don't initialize fields
-      this.image = null;
+      this.compressed_image = null;
       this.steering_angle = null;
       this.throttle_value = null;
     }
     else {
-      if (initObj.hasOwnProperty('image')) {
-        this.image = initObj.image
+      if (initObj.hasOwnProperty('compressed_image')) {
+        this.compressed_image = initObj.compressed_image
       }
       else {
-        this.image = new sensor_msgs.msg.Image();
+        this.compressed_image = new sensor_msgs.msg.CompressedImage();
       }
       if (initObj.hasOwnProperty('steering_angle')) {
         this.steering_angle = initObj.steering_angle
@@ -48,8 +48,8 @@ class custom {
 
   static serialize(obj, buffer, bufferOffset) {
     // Serializes a message object of type custom
-    // Serialize message field [image]
-    bufferOffset = sensor_msgs.msg.Image.serialize(obj.image, buffer, bufferOffset);
+    // Serialize message field [compressed_image]
+    bufferOffset = sensor_msgs.msg.CompressedImage.serialize(obj.compressed_image, buffer, bufferOffset);
     // Serialize message field [steering_angle]
     bufferOffset = std_msgs.msg.Float32.serialize(obj.steering_angle, buffer, bufferOffset);
     // Serialize message field [throttle_value]
@@ -61,8 +61,8 @@ class custom {
     //deserializes a message object of type custom
     let len;
     let data = new custom(null);
-    // Deserialize message field [image]
-    data.image = sensor_msgs.msg.Image.deserialize(buffer, bufferOffset);
+    // Deserialize message field [compressed_image]
+    data.compressed_image = sensor_msgs.msg.CompressedImage.deserialize(buffer, bufferOffset);
     // Deserialize message field [steering_angle]
     data.steering_angle = std_msgs.msg.Float32.deserialize(buffer, bufferOffset);
     // Deserialize message field [throttle_value]
@@ -72,7 +72,7 @@ class custom {
 
   static getMessageSize(object) {
     let length = 0;
-    length += sensor_msgs.msg.Image.getMessageSize(object.image);
+    length += sensor_msgs.msg.CompressedImage.getMessageSize(object.compressed_image);
     return length + 8;
   }
 
@@ -83,21 +83,19 @@ class custom {
 
   static md5sum() {
     //Returns md5sum for a message object
-    return '48c8011b63e2f995bac8b531cb24cad0';
+    return '3a65ddb3433fdf5ed9029c363843bd15';
   }
 
   static messageDefinition() {
     // Returns full string definition for message
     return `
-    sensor_msgs/Image image
+    sensor_msgs/CompressedImage compressed_image
     std_msgs/Float32 steering_angle
     std_msgs/Float32 throttle_value
     
     ================================================================================
-    MSG: sensor_msgs/Image
-    # This message contains an uncompressed image
-    # (0, 0) is at top-left corner of image
-    #
+    MSG: sensor_msgs/CompressedImage
+    # This message contains a compressed image
     
     Header header        # Header timestamp should be acquisition time of image
                          # Header frame_id should be optical frame of camera
@@ -105,23 +103,11 @@ class custom {
                          # +x should point to the right in the image
                          # +y should point down in the image
                          # +z should point into to plane of the image
-                         # If the frame_id here and the frame_id of the CameraInfo
-                         # message associated with the image conflict
-                         # the behavior is undefined
     
-    uint32 height         # image height, that is, number of rows
-    uint32 width          # image width, that is, number of columns
-    
-    # The legal values for encoding are in file src/image_encodings.cpp
-    # If you want to standardize a new string format, join
-    # ros-users@lists.sourceforge.net and send an email proposing a new encoding.
-    
-    string encoding       # Encoding of pixels -- channel meaning, ordering, size
-                          # taken from the list of strings in include/sensor_msgs/image_encodings.h
-    
-    uint8 is_bigendian    # is this data bigendian?
-    uint32 step           # Full row length in bytes
-    uint8[] data          # actual matrix data, size is (step * rows)
+    string format        # Specifies the format of the data
+                         #   Acceptable values:
+                         #     jpeg, png
+    uint8[] data         # Compressed image buffer
     
     ================================================================================
     MSG: std_msgs/Header
@@ -151,11 +137,11 @@ class custom {
       msg = {};
     }
     const resolved = new custom(null);
-    if (msg.image !== undefined) {
-      resolved.image = sensor_msgs.msg.Image.Resolve(msg.image)
+    if (msg.compressed_image !== undefined) {
+      resolved.compressed_image = sensor_msgs.msg.CompressedImage.Resolve(msg.compressed_image)
     }
     else {
-      resolved.image = new sensor_msgs.msg.Image()
+      resolved.compressed_image = new sensor_msgs.msg.CompressedImage()
     }
 
     if (msg.steering_angle !== undefined) {

@@ -53,7 +53,7 @@ def talker():
 		steering_angle = process_frame(frame)
   
 		msg = custom()
-		msg.image = bridge.cv2_to_imgmsg(frame, encoding="bgr8")
+		msg.compressed_image = bridge.cv2_to_compressed_imgmsg(frame)
 		msg.steering_angle.data = steering_angle
 		msg.throttle_value.data = 0.9
 		pub.publish(msg)
