@@ -1,0 +1,3 @@
+sensor_msgs/CompressedImage compressed_image
+std_msgs/Float32 steering_angle
+std_msgs/Float32 throttle_value

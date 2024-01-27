@@ -7,11 +7,7 @@ from cv_bridge import CvBridge, CvBridgeError
 import cv2
 import numpy as np
 from std_msgs.msg import Float32
-import csv  # Import CSV module
-
-
-# Define a list to store data
-data_list = []
+from custom_msg_python.msg import custom
 
 def process_frame(frame):
 	pub_steering = rospy.Publisher('steering', Float32, queue_size=8)
@@ -42,42 +38,36 @@ def process_frame(frame):
 
 	cv2.drawContours(frame, contours, -1, (0,0,255),1)
 	pub_steering.publish(steering_angle)
-	data_list.append((frame, steering_angle, 0.9))
-	return frame
+	return steering_angle
 
 
 def talker():
 	bridge = CvBridge()
+	pub = rospy.Publisher('/data', custom, queue_size=1)
 	camera = nano.Camera(flip=0, width=160, height=120, fps=10)
-	pub = rospy.Publisher('/lane', Image, queue_size = 1)
 	rospy.init_node('image', anonymous = False)
 	rate = rospy.Rate(10)
 	while not rospy.is_shutdown():
 		frame = camera.read()
-		#if not ret:
-		#	break
-		new_frame = process_frame(frame)
-		msg = bridge.cv2_to_imgmsg(new_frame, "bgr8")
+
+		steering_angle = process_frame(frame)
+  
+		msg = custom()
+		msg.compressed_image = bridge.cv2_to_compressed_imgmsg(frame)
+		msg.steering_angle.data = steering_angle
+		msg.throttle_value.data = 0.9
 		pub.publish(msg)
+		# msg = bridge.cv2_to_imgmsg(new_frame, "bgr8")
 
 		if cv2.waitKey(1) & 0xFF == ord('q'):
 			break
 
 		rate.sleep()
-	# Save data to a CSV file before exiting
-	save_to_csv(data_list, "recorded_data.csv")
 
     # Release camera resources
 	camera.release()
 	del camera
 	
-
-def save_to_csv(data, filename):
-    # Save the recorded data to a CSV file
-    with open(filename, 'w', newline='') as csvfile:
-        csvwriter = csv.writer(csvfile)
-        csvwriter.writerow(['Image', 'Steering', 'Throttle'])  # Write header
-        csvwriter.writerows(data)
 
 if __name__ == '__main__':
 	try:
